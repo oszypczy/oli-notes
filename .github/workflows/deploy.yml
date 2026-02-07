@@ -35,6 +35,7 @@ jobs:
           username: opc
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u oszypczy --password-stdin
             docker pull ghcr.io/oszypczy/notes:latest
             mkdir -p ~/apps/notes
             cd ~/apps/notes
