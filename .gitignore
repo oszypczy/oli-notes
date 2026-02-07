@@ -13,7 +13,10 @@ dist-ssr
 *.local
 
 # PDFs are stored on the server, not in the repo
-public/pdfs/
+**/public/pdfs/
+
+# Vite cache
+.vite/
 
 # Editor directories and files
 .vscode/*
