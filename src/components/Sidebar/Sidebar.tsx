@@ -5,23 +5,29 @@ import styles from './Sidebar.module.css';
 
 interface SidebarProps {
   tree: TreeNode[];
+  loading: boolean;
+  error: string | null;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   selectedPath: string | null;
   onSelectPdf: (pdf: PdfFile) => void;
 }
 
-export function Sidebar({ tree, searchQuery, onSearchChange, selectedPath, onSelectPdf }: SidebarProps) {
+export function Sidebar({ tree, loading, error, searchQuery, onSearchChange, selectedPath, onSelectPdf }: SidebarProps) {
   return (
     <aside className={styles.sidebar}>
       <SearchBar value={searchQuery} onChange={onSearchChange} />
       <div className={styles.treeContainer}>
-        <TreeView
-          tree={tree}
-          searchQuery={searchQuery}
-          selectedPath={selectedPath}
-          onSelectPdf={onSelectPdf}
-        />
+        {loading && <p className={styles.status}>Ładowanie...</p>}
+        {error && <p className={styles.status}>{error}</p>}
+        {!loading && !error && (
+          <TreeView
+            tree={tree}
+            searchQuery={searchQuery}
+            selectedPath={selectedPath}
+            onSelectPdf={onSelectPdf}
+          />
+        )}
       </div>
       <div className={styles.disclaimer}>
         <p>

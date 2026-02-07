@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+# Studia IV - OliNotes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Przeglądarka notatek PDF ze studiów na Wydziale Elektroniki i Technik Informacyjnych Politechniki Warszawskiej.
 
-Currently, two official plugins are available:
+## Stack technologiczny
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** + **TypeScript** + **Vite**
+- CSS Modules (ciemny motyw)
+- Nginx (serwer produkcyjny)
+- Docker (multi-stage build)
+- GitHub Actions (CI/CD)
 
-## React Compiler
+## Uruchomienie lokalne
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+PDFy nie są trzymane w repo. Dla lokalnego developmentu wrzuć pliki PDF do `public/pdfs/` (folder jest w `.gitignore`) i wygeneruj `tree.json`:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+bash scripts/generate-tree.sh ./public/pdfs
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Budowanie
+
+```bash
+npm run build      # TypeScript check + Vite build
+npm run preview    # Podgląd zbudowanej wersji
+npm run lint       # ESLint
+```
+
+## Docker
+
+```bash
+docker compose up
+```
+
+Aplikacja na porcie `3001`. PDFy montowane z hosta przez Docker volume.
+
+## Deployment
+
+Push na branch `main` uruchamia GitHub Actions workflow, który:
+
+1. Buduje obraz Docker (bez PDFów - lekki image)
+2. Publikuje go w GitHub Container Registry (`ghcr.io/oszypczy/notes:latest`)
+3. Łączy się po SSH z serwerem i restartuje kontener z volume mount na PDFy
+
+Wymagane sekrety w repozytorium: `SSH_PRIVATE_KEY`, `GHCR_TOKEN`.
+
+## Zarządzanie PDFami na serwerze
+
+PDFy są przechowywane na serwerze w `~/data/notes/pdfs/`, montowane do kontenera Docker jako volume.
+
+```bash
+# Prześlij nowe PDFy
+scp -i ~/.ssh/oracle_cloud notatki.pdf opc@130.61.246.215:~/data/notes/pdfs/semestr-1/
+
+# Wygeneruj tree.json
+ssh -i ~/.ssh/oracle_cloud opc@130.61.246.215 'bash ~/scripts/generate-tree.sh'
+
+# Gotowe - strona od razu widzi nowe pliki (bez rebuilda)
 ```

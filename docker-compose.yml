@@ -3,4 +3,6 @@ services:
     image: ghcr.io/oszypczy/notes:latest
     ports:
       - "3001:80"
+    volumes:
+      - ~/data/notes/pdfs:/usr/share/nginx/html/pdfs
     restart: unless-stopped

@@ -37,7 +37,7 @@ jobs:
           script: |
             echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u oszypczy --password-stdin
             docker pull ghcr.io/oszypczy/notes:latest
-            mkdir -p ~/apps/notes
+            mkdir -p ~/apps/notes ~/data/notes/pdfs
             cd ~/apps/notes
             cat > docker-compose.yml << 'COMPOSE'
             services:
@@ -45,6 +45,8 @@ jobs:
                 image: ghcr.io/oszypczy/notes:latest
                 ports:
                   - "80:80"
+                volumes:
+                  - /home/opc/data/notes/pdfs:/usr/share/nginx/html/pdfs
                 restart: unless-stopped
             COMPOSE
             docker compose up -d --force-recreate
