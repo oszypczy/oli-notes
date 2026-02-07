@@ -29,6 +29,12 @@ export function PdfViewer({ pdf }: PdfViewerProps) {
     setProgress(0);
     setBlobUrl(null);
 
+    if (!pdf.path.startsWith('/pdfs/') || pdf.path.includes('..')) {
+      console.error('Invalid PDF path:', pdf.path);
+      setLoading(false);
+      return;
+    }
+
     fetch(pdf.path, { signal: controller.signal })
       .then(async (response) => {
         const contentLength = response.headers.get('Content-Length');

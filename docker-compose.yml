@@ -4,5 +4,11 @@ services:
     ports:
       - "3001:80"
     volumes:
-      - ~/data/notes/pdfs:/usr/share/nginx/html/pdfs
+      - ~/data/notes/pdfs:/usr/share/nginx/html/pdfs:ro
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

@@ -31,8 +31,8 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1
         with:
-          host: 130.61.246.215
-          username: opc
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u oszypczy --password-stdin
@@ -46,7 +46,13 @@ jobs:
                 ports:
                   - "80:80"
                 volumes:
-                  - /home/opc/data/notes/pdfs:/usr/share/nginx/html/pdfs
+                  - /home/opc/data/notes/pdfs:/usr/share/nginx/html/pdfs:ro
                 restart: unless-stopped
+                healthcheck:
+                  test: ["CMD", "curl", "-f", "http://localhost:80/"]
+                  interval: 30s
+                  timeout: 5s
+                  retries: 3
+                  start_period: 10s
             COMPOSE
             docker compose up -d --force-recreate
