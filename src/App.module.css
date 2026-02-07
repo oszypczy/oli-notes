@@ -8,4 +8,20 @@
   flex: 1;
   display: flex;
   overflow: hidden;
+  position: relative;
+}
+
+.overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    top: var(--header-height-mobile);
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+  }
 }

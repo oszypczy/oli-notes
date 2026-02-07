@@ -1,5 +1,5 @@
 import type { TreeNode, PdfFile } from '../../types';
-import { GitLabIcon } from '../icons';
+import { GitLabIcon, CloseIcon } from '../icons';
 import { SearchBar } from '../SearchBar/SearchBar';
 import { TreeView } from '../TreeView/TreeView';
 import styles from './Sidebar.module.css';
@@ -12,11 +12,19 @@ interface SidebarProps {
   onSearchChange: (query: string) => void;
   selectedPath: string | null;
   onSelectPdf: (pdf: PdfFile) => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function Sidebar({ tree, loading, error, searchQuery, onSearchChange, selectedPath, onSelectPdf }: SidebarProps) {
+export function Sidebar({ tree, loading, error, searchQuery, onSearchChange, selectedPath, onSelectPdf, isOpen, onClose }: SidebarProps) {
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
+      <div className={styles.mobileHeader}>
+        <span className={styles.mobileTitle}>Menu</span>
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Zamknij menu">
+          <CloseIcon />
+        </button>
+      </div>
       <SearchBar value={searchQuery} onChange={onSearchChange} />
       <div className={styles.treeContainer}>
         {loading && <p className={styles.status}>Ładowanie...</p>}

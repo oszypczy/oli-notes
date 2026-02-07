@@ -15,6 +15,23 @@
   gap: 12px;
 }
 
+.menuBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.menuBtn:hover {
+  background-color: var(--color-bg-hover);
+}
+
 .icon {
   width: 24px;
   height: 24px;
@@ -29,4 +46,23 @@
 .credit {
   font-size: 0.8rem;
   color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+  .header {
+    height: var(--header-height-mobile);
+    padding: 0 12px;
+  }
+
+  .menuBtn {
+    display: flex;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .credit {
+    display: none;
+  }
 }

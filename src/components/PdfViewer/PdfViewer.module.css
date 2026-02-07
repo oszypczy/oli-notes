@@ -103,3 +103,22 @@
     opacity: 1;
   }
 }
+
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 8px 12px;
+  }
+
+  .fileName {
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60vw;
+  }
+
+  .downloadBtn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
