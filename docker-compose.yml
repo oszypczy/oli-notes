@@ -3,8 +3,10 @@ services:
     image: ghcr.io/oszypczy/notes:latest
     ports:
       - "3001:80"
+      - "3443:443"
     volumes:
       - ~/data/notes/pdfs:/usr/share/nginx/html/pdfs:ro
+      - ~/ssl/cloudflare:/etc/ssl/cloudflare:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/"]
