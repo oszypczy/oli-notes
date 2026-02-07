@@ -13,7 +13,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
       <input
         className={styles.input}
         type="text"
-        placeholder="Szukaj przedmiotu..."
+        placeholder="Szukaj zasobu..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />

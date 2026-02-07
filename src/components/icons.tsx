@@ -62,6 +62,20 @@ export function BookIcon({ className }: IconProps) {
   );
 }
 
+export function GitLabIcon({ className }: IconProps) {
+  return (
+    <svg className={className} width="18" height="18" viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M190 353.2L253.3 158.6H126.7L190 353.2Z" fill="#E24329" />
+      <path d="M190 353.2L126.7 158.6H24.9L190 353.2Z" fill="#FC6D26" />
+      <path d="M24.9 158.6L3.4 224.7C1.5 230.5 3.5 236.9 8.5 240.5L190 353.2L24.9 158.6Z" fill="#FCA326" />
+      <path d="M24.9 158.6H126.7L82.8 23.4C80.7 17.2 72 17.2 69.9 23.4L24.9 158.6Z" fill="#E24329" />
+      <path d="M190 353.2L253.3 158.6H355.1L190 353.2Z" fill="#FC6D26" />
+      <path d="M355.1 158.6L376.6 224.7C378.5 230.5 376.5 236.9 371.5 240.5L190 353.2L355.1 158.6Z" fill="#FCA326" />
+      <path d="M355.1 158.6H253.3L297.2 23.4C299.3 17.2 308 17.2 310.1 23.4L355.1 158.6Z" fill="#E24329" />
+    </svg>
+  );
+}
+
 export function DocumentIcon({ className }: IconProps) {
   return (
     <svg className={className} width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

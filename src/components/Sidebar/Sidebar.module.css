@@ -33,3 +33,21 @@
   margin-top: 4px;
   opacity: 0.7;
 }
+
+.gitlabLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 0.7rem;
+  transition: background-color var(--transition-fast);
+}
+
+.gitlabLink:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

@@ -1,4 +1,5 @@
 import type { TreeNode, PdfFile } from '../../types';
+import { GitLabIcon } from '../icons';
 import { SearchBar } from '../SearchBar/SearchBar';
 import { TreeView } from '../TreeView/TreeView';
 import styles from './Sidebar.module.css';
@@ -36,6 +37,15 @@ export function Sidebar({ tree, loading, error, searchQuery, onSearchChange, sel
           w celach komercyjnych bez zgody autora jest zabronione.
         </p>
         <p className={styles.copyright}>&copy; {new Date().getFullYear()} Oliwier Szypczyn</p>
+        <a
+          className={styles.gitlabLink}
+          href="https://gitlab-stud.elka.pw.edu.pl/oszypczy"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <GitLabIcon />
+          GitLab
+        </a>
       </div>
     </aside>
   );
