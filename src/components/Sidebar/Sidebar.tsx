@@ -39,7 +39,7 @@ export function Sidebar({ tree, loading, error, searchQuery, onSearchChange, sel
         <p className={styles.copyright}>&copy; {new Date().getFullYear()} Oliwier Szypczyn</p>
         <a
           className={styles.gitlabLink}
-          href="https://gitlab-stud.elka.pw.edu.pl/oszypczy"
+          href="https://gitlab-stud.elka.pw.edu.pl/users/oszypczy/projects"
           target="_blank"
           rel="noopener noreferrer"
         >
