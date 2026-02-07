@@ -1,0 +1,6 @@
+services:
+  notes:
+    image: ghcr.io/oszypczy/notes:latest
+    ports:
+      - "3001:80"
+    restart: unless-stopped
