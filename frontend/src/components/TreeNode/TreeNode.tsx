@@ -15,7 +15,7 @@ export function TreeNode({ node, depth, selectedPath, onSelectPdf, isSearching }
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    if (isSearching) setIsExpanded(true);
+    setIsExpanded(isSearching);
   }, [isSearching]);
 
   if (node.type === 'file') {

@@ -1,10 +1,23 @@
-import { useState, useCallback } from 'react';
-import type { PdfFile } from './types';
+import { useState, useCallback, useMemo } from 'react';
+import type { PdfFile, TreeNode } from './types';
 import { usePdfTree } from './hooks/usePdfTree';
 import { Header } from './components/Header/Header';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { PdfViewer } from './components/PdfViewer/PdfViewer';
 import styles from './App.module.css';
+
+function findBreadcrumb(nodes: TreeNode[], path: string): string[] | null {
+  for (const node of nodes) {
+    if (node.type === 'file' && node.path === path) {
+      return [node.label];
+    }
+    if (node.type === 'folder') {
+      const result = findBreadcrumb(node.children, path);
+      if (result) return [node.label, ...result];
+    }
+  }
+  return null;
+}
 
 function App() {
   const { tree, loading, error } = usePdfTree();
@@ -16,6 +29,11 @@ function App() {
     setSelectedPdf(pdf);
     setSidebarOpen(false);
   }, []);
+
+  const breadcrumb = useMemo(() => {
+    if (!selectedPdf || !tree.length) return null;
+    return findBreadcrumb(tree, selectedPdf.path);
+  }, [tree, selectedPdf]);
 
   return (
     <div className={styles.layout}>
@@ -41,7 +59,7 @@ function App() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
-        <PdfViewer pdf={selectedPdf} />
+        <PdfViewer pdf={selectedPdf} breadcrumb={breadcrumb} />
       </main>
     </div>
   );

@@ -6,9 +6,10 @@ import styles from './PdfViewer.module.css';
 
 interface PdfViewerProps {
   pdf: PdfFile | null;
+  breadcrumb: string[] | null;
 }
 
-export function PdfViewer({ pdf }: PdfViewerProps) {
+export function PdfViewer({ pdf, breadcrumb }: PdfViewerProps) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -97,7 +98,7 @@ export function PdfViewer({ pdf }: PdfViewerProps) {
   return (
     <div className={styles.viewer}>
       <div className={styles.toolbar}>
-        <span className={styles.fileName}>{pdf.label}</span>
+        <span className={styles.fileName}>{breadcrumb ? breadcrumb.join(' / ') : pdf.label}</span>
         <a className={styles.downloadBtn} href={pdf.path} download>
           <DownloadIcon />
           Pobierz
