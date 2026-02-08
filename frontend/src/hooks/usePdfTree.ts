@@ -41,6 +41,7 @@ export function usePdfTree(): UsePdfTreeResult {
   useEffect(() => {
     fetch('/pdfs/tree.json')
       .then((res) => {
+        if (res.status === 401) throw new Error('Sesja wygasła — zaloguj się ponownie');
         if (!res.ok) throw new Error('Nie udało się załadować listy plików');
         return res.json();
       })

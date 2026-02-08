@@ -1,9 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { PdfFile, TreeNode } from './types';
 import { usePdfTree } from './hooks/usePdfTree';
+import { useAuth } from './hooks/useAuth';
 import { Header } from './components/Header/Header';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { PdfViewer } from './components/PdfViewer/PdfViewer';
+import { LoginScreen } from './components/LoginScreen/LoginScreen';
 import styles from './App.module.css';
 
 function findBreadcrumb(nodes: TreeNode[], path: string): string[] | null {
@@ -20,6 +22,7 @@ function findBreadcrumb(nodes: TreeNode[], path: string): string[] | null {
 }
 
 function App() {
+  const { user, loading: authLoading, logout } = useAuth();
   const { tree, loading, error } = usePdfTree();
   const [selectedPdf, setSelectedPdf] = useState<PdfFile | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,11 +38,21 @@ function App() {
     return findBreadcrumb(tree, selectedPdf.path);
   }, [tree, selectedPdf]);
 
+  if (authLoading) {
+    return <div className={styles.authLoading}>Ładowanie...</div>;
+  }
+
+  if (!user) {
+    return <LoginScreen />;
+  }
+
   return (
     <div className={styles.layout}>
       <Header
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(prev => !prev)}
+        user={user}
+        onLogout={logout}
       />
       <main className={styles.main}>
         {sidebarOpen && (

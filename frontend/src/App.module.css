@@ -11,6 +11,15 @@
   position: relative;
 }
 
+.authLoading {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+}
+
 .overlay {
   display: none;
 }
