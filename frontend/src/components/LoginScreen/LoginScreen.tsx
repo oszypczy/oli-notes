@@ -10,7 +10,7 @@ export function LoginScreen() {
         <img src="/favicon.ico" alt="" className={styles.icon} />
         <h1 className={styles.title}>OliNotes</h1>
         <p className={styles.subtitle}>
-          Notatki studenckie — Informatyka, Wydział EiTI, PW
+          Notatki studenckie
         </p>
 
         {authError && (
