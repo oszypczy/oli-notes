@@ -24,7 +24,7 @@ export function Header({ onToggleSidebar, user, onLogout }: HeaderProps) {
       </div>
       <div className={styles.right}>
         <p className={styles.credit}>
-          Oliwier Szypczyn · Informatyka · Wydział EiTI · Politechnika Warszawska
+          Informatyka · Wydział EiTI · Politechnika Warszawska
         </p>
         {user && (
           <div className={styles.userInfo}>
