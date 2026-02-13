@@ -11,7 +11,7 @@ Plan: AI Chat — asystent przeszukiwania notatek PDF                           
 │ - Sugerowac powiazane materialy (np. kolosy z tego tematu)                                    │
 │                                                                                               │
 │ Kluczowe ograniczenia:                                                                        │
-│ - Serwer: Oracle Cloud Free Tier — 503 MB RAM, 283 MB zajete                                  │
+│ - Serwer: mało RAM (~500 MB), większość zajęta                                                │
 │ - PDF-y w wyklad*/ to odrecznie pisane notatki (przetestowane — AI vision czyta je dobrze)    │
 │ - Uzytkownik nie chce placic — uzycie Gemini API free tier (1500 req/day, 15 req/min)         │
 │ - Brak bazy danych                                                                            │

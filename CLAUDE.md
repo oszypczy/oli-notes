@@ -73,7 +73,7 @@ GitHub Actions on push to `main`:
 2. Pushes to GHCR (`ghcr.io/oszypczy/notes:latest`, `ghcr.io/oszypczy/notes-auth:latest`)
 3. SSHs to server, pulls images, writes `docker-compose.yml`, runs `docker compose up -d --force-recreate`
 
-Server: Oracle Cloud Free Tier, Oracle Linux 9. Caddy as TLS-terminating reverse proxy in front of nginx. Cloudflare DNS proxy with Full Strict SSL.
+Caddy as TLS-terminating reverse proxy in front of nginx. Cloudflare DNS proxy with Full Strict SSL.
 
 ### Required secrets (GitHub Actions)
 `SSH_PRIVATE_KEY`, `SERVER_HOST`, `SERVER_USER`, `GHCR_TOKEN`
@@ -86,8 +86,8 @@ Server: Oracle Cloud Free Tier, Oracle Linux 9. Caddy as TLS-terminating reverse
 PDFs are stored on the server at `~/data/notes/pdfs/`, mounted into the nginx container. Not in the repo.
 
 ```bash
-scp -i ~/.ssh/oracle_cloud notatki.pdf opc@SERVER:~/data/notes/pdfs/semestr/
-ssh -i ~/.ssh/oracle_cloud opc@SERVER 'bash ~/scripts/generate-tree.sh'
+scp notatki.pdf SERVER:~/data/notes/pdfs/semestr/
+ssh SERVER 'bash ~/scripts/generate-tree.sh'
 ```
 
 For local dev: put PDFs in `frontend/public/pdfs/` (gitignored) and run `bash scripts/generate-tree.sh ./frontend/public/pdfs`.

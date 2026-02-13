@@ -9,7 +9,7 @@ Przeglądarka notatek PDF ze studiów na Wydziale Elektroniki i Technik Informac
 - **Nginx** (reverse proxy, auth subrequests, rate limiting)
 - **Docker** (multi-stage builds, docker-compose)
 - **GitHub Actions** (CI/CD)
-- **Serwer:** Oracle Cloud Free Tier + Caddy (TLS) + Cloudflare DNS
+- **Serwer:** Caddy (TLS) + Cloudflare DNS
 
 ## Architektura
 
@@ -85,10 +85,10 @@ PDFy są przechowywane na serwerze w `~/data/notes/pdfs/`, montowane do kontener
 
 ```bash
 # Prześlij nowe PDFy
-scp -i ~/.ssh/oracle_cloud notatki.pdf opc@SERVER:~/data/notes/pdfs/semestr/
+scp notatki.pdf SERVER:~/data/notes/pdfs/semestr/
 
 # Wygeneruj tree.json
-ssh -i ~/.ssh/oracle_cloud opc@SERVER 'bash ~/scripts/generate-tree.sh'
+ssh SERVER 'bash ~/scripts/generate-tree.sh'
 ```
 
 Strona od razu widzi nowe pliki (bez rebuilda).
