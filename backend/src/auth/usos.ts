@@ -46,14 +46,16 @@ export async function getRequestToken(state: string): Promise<{ token: string; a
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams({ oauth_callback: config.callbackUrl, scopes: 'studies|email' }),
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!response.ok) throw new Error(`USOS request_token failed: ${response.status}`);
 
   const text = await response.text();
   const params = new URLSearchParams(text);
-  const token = params.get('oauth_token')!;
-  const tokenSecret = params.get('oauth_token_secret')!;
+  const token = params.get('oauth_token');
+  const tokenSecret = params.get('oauth_token_secret');
+  if (!token || !tokenSecret) throw new Error('USOS request_token: missing oauth_token or secret');
 
   pendingTokens.set(token, {
     secret: tokenSecret,
@@ -98,6 +100,7 @@ export async function getAccessToken(
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams({ oauth_verifier: oauthVerifier }),
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!response.ok) throw new Error(`USOS access_token failed: ${response.status}`);
@@ -105,10 +108,11 @@ export async function getAccessToken(
   const text = await response.text();
   const params = new URLSearchParams(text);
 
-  return {
-    accessToken: params.get('oauth_token')!,
-    accessSecret: params.get('oauth_token_secret')!,
-  };
+  const accessToken = params.get('oauth_token');
+  const accessSecret = params.get('oauth_token_secret');
+  if (!accessToken || !accessSecret) throw new Error('USOS access_token: missing token or secret');
+
+  return { accessToken, accessSecret };
 }
 
 // --- User info ---
@@ -123,6 +127,7 @@ export async function getUser(
 
   const response = await fetch(userUrl, {
     headers: { ...oauth.toHeader(oauth.authorize(requestData, tokenData)) },
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!response.ok) throw new Error(`USOS user fetch failed: ${response.status}`);

@@ -9,7 +9,11 @@ export const config = {
   consumerKey: requireEnv('USOS_CONSUMER_KEY'),
   consumerSecret: requireEnv('USOS_CONSUMER_SECRET'),
 
-  jwtSecret: requireEnv('JWT_SECRET'),
+  jwtSecret: (() => {
+    const secret = requireEnv('JWT_SECRET');
+    if (secret.length < 32) throw new Error('JWT_SECRET must be at least 32 characters');
+    return secret;
+  })(),
   jwtExpiresIn: '24h',
 
   callbackUrl: requireEnv('CALLBACK_URL'),

@@ -42,7 +42,13 @@ authRouter.get('/auth/callback', async (req: Request, res: Response) => {
   const { oauth_token, oauth_verifier } = req.query;
   const state = req.cookies[STATE_COOKIE];
 
-  res.clearCookie(STATE_COOKIE, { path: '/' });
+  res.clearCookie(STATE_COOKIE, {
+    path: '/',
+    httpOnly: true,
+    secure: config.isProduction,
+    sameSite: 'lax' as const,
+    domain: config.cookieDomain,
+  });
 
   if (typeof oauth_token !== 'string' || typeof oauth_verifier !== 'string' || !state) {
     res.redirect(`${config.frontendUrl}?auth_error=invalid_callback`);
@@ -63,7 +69,7 @@ authRouter.get('/auth/callback', async (req: Request, res: Response) => {
       email: (user.email || '').slice(0, 320),
     });
 
-    console.log(`User logged in: ${user.id} (${user.first_name} ${user.last_name})`);
+    console.log(`User logged in: ${user.id}`);
 
     res.cookie(SESSION_COOKIE, token, cookieOptions);
     res.redirect(config.frontendUrl);
@@ -92,7 +98,13 @@ authRouter.get('/api/auth/me', (req: Request, res: Response) => {
 
 // --- 4. Wylogowanie ---
 authRouter.post('/auth/logout', (_req: Request, res: Response) => {
-  res.clearCookie(SESSION_COOKIE, { path: '/' });
+  res.clearCookie(SESSION_COOKIE, {
+    path: '/',
+    httpOnly: true,
+    secure: config.isProduction,
+    sameSite: 'lax' as const,
+    domain: config.cookieDomain,
+  });
   res.json({ ok: true });
 });
 
@@ -110,5 +122,6 @@ authRouter.get('/auth/verify', (req: Request, res: Response) => {
     return;
   }
 
+  res.set('X-User-Id', payload.usosId);
   res.sendStatus(200);
 });

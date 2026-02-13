@@ -1,6 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { authRouter } from './auth/routes.js';
 import { config } from './config.js';
 
@@ -14,6 +15,13 @@ app.use(helmet({
 app.use(cookieParser());
 
 app.set('trust proxy', 1);
+
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+}));
 
 app.use(authRouter);
 

@@ -43,7 +43,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u oszypczy --password-stdin
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u oszypczy --password-stdin
             docker pull ghcr.io/oszypczy/notes:latest
             docker pull ghcr.io/oszypczy/notes-auth:latest
             mkdir -p ~/apps/notes ~/data/notes/pdfs
