@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 interface User {
   name: string;
   email: string;
+  isAdmin?: boolean;
 }
 
 interface UseAuthResult {

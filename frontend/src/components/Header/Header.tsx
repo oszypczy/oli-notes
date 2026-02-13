@@ -4,7 +4,7 @@ import styles from './Header.module.css';
 interface HeaderProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
-  user?: { name: string };
+  user?: { name: string; isAdmin?: boolean };
   onLogout?: () => void;
 }
 
@@ -29,6 +29,9 @@ export function Header({ onToggleSidebar, user, onLogout }: HeaderProps) {
         {user && (
           <div className={styles.userInfo}>
             <span className={styles.userName}>{user.name}</span>
+            {user.isAdmin && (
+              <a href="/admin" className={styles.adminBtn}>Admin</a>
+            )}
             <button onClick={onLogout} className={styles.logoutBtn}>Wyloguj</button>
           </div>
         )}

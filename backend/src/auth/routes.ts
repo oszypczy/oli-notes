@@ -67,7 +67,7 @@ authRouter.get('/auth/callback', async (req: Request, res: Response) => {
 
     if (!isFromFaculty(user, config.allowedFacultyId)) {
       console.log(`Access denied for user ${user.id}: not from allowed faculty`);
-      eventLogger.log('login_denied_faculty', { usosId: String(user.id), ip: req.ip });
+      eventLogger.log('login_denied_faculty', { usosId: String(user.id) });
       res.redirect(`${config.frontendUrl}?auth_error=wrong_faculty`);
       return;
     }
@@ -80,13 +80,13 @@ authRouter.get('/auth/callback', async (req: Request, res: Response) => {
     });
 
     console.log(`User logged in: ${user.id}`);
-    eventLogger.log('login_success', { usosId: String(user.id), ip: req.ip });
+    eventLogger.log('login_success', { usosId: String(user.id) });
 
     res.cookie(SESSION_COOKIE, token, cookieOptions);
     res.redirect(config.frontendUrl);
   } catch (err) {
     console.error('OAuth callback failed:', err);
-    eventLogger.log('error', { detail: 'OAuth callback failed', ip: req.ip });
+    eventLogger.log('error', { detail: 'OAuth callback failed' });
     res.redirect(`${config.frontendUrl}?auth_error=callback_failed`);
   }
 });
@@ -113,7 +113,7 @@ authRouter.post('/auth/logout', (req: Request, res: Response) => {
   const token = req.cookies[SESSION_COOKIE];
   if (token) {
     const payload = verifyToken(token);
-    if (payload) eventLogger.log('logout', { usosId: payload.usosId, ip: req.ip });
+    if (payload) eventLogger.log('logout', { usosId: payload.usosId });
   }
   res.clearCookie(SESSION_COOKIE, {
     path: '/',
@@ -128,17 +128,14 @@ authRouter.post('/auth/logout', (req: Request, res: Response) => {
 // --- 5. Weryfikacja dla nginx auth_request ---
 authRouter.get('/auth/verify', (req: Request, res: Response) => {
   const token = req.cookies[SESSION_COOKIE];
-  if (!token) {
-    eventLogger.log('auth_verify_fail', { detail: 'no_token', ip: req.ip });
-    res.sendStatus(401);
-    return;
-  }
+  if (!token) { res.sendStatus(401); return; }
 
   const payload = verifyToken(token);
-  if (!payload) {
-    eventLogger.log('auth_verify_fail', { detail: 'invalid_token', ip: req.ip });
-    res.sendStatus(401);
-    return;
+  if (!payload) { res.sendStatus(401); return; }
+
+  const originalUri = req.headers['x-original-uri'] as string | undefined;
+  if (originalUri && originalUri.endsWith('.pdf')) {
+    eventLogger.log('resource_access', { usosId: payload.usosId, detail: originalUri });
   }
 
   res.set('X-User-Id', payload.usosId);

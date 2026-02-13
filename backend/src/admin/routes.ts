@@ -8,7 +8,7 @@ export const adminRouter = Router();
 
 const VALID_TYPES: EventType[] = [
   'login_success', 'login_denied_faculty', 'logout',
-  'auth_verify_fail', 'error', 'admin_access',
+  'resource_access', 'error',
 ];
 
 const adminLimit = rateLimit({
@@ -25,7 +25,6 @@ function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   const payload = verifyToken(token);
   if (!payload || !payload.isAdmin) { res.status(403).json({ error: 'Forbidden' }); return; }
 
-  eventLogger.log('admin_access', { usosId: payload.usosId, ip: req.ip });
   next();
 }
 
@@ -53,4 +52,9 @@ adminRouter.get('/api/admin/events', adminLimit, requireAdmin, (req: Request, re
 
 adminRouter.get('/api/admin/stats', adminLimit, requireAdmin, (_req: Request, res: Response) => {
   res.json(eventLogger.getStats());
+});
+
+adminRouter.get('/api/admin/activity', adminLimit, requireAdmin, (req: Request, res: Response) => {
+  const hours = Math.min(parseInt(req.query.hours as string) || 6, 24);
+  res.json(eventLogger.getActivity(hours));
 });
