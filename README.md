@@ -2,6 +2,8 @@
 
 Przeglądarka notatek PDF ze studiów na Wydziale Elektroniki i Technik Informacyjnych Politechniki Warszawskiej. Dostęp tylko dla studentów WEiTI, uwierzytelnianie przez USOS.
 
+**https://notes.oszypczyn.com**
+
 ## Stack technologiczny
 
 - **Frontend:** React 19 + TypeScript + Vite (CSS Modules, ciemny motyw)
