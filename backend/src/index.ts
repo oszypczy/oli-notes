@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { authRouter } from './auth/routes.js';
+import { adminRouter } from './admin/routes.js';
 import { config } from './config.js';
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(rateLimit({
 }));
 
 app.use(authRouter);
+app.use(adminRouter);
 
 app.get('/health', (_req, res) => res.sendStatus(200));
 

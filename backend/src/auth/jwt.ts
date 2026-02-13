@@ -5,6 +5,7 @@ export interface TokenPayload {
   usosId: string;
   name: string;
   email: string;
+  isAdmin: boolean;
 }
 
 export function signToken(payload: TokenPayload): string {

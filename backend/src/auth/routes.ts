@@ -3,6 +3,7 @@ import { Router, Request, Response } from 'express';
 import { getRequestToken, getAccessToken, getUser, isFromFaculty } from './usos.js';
 import { signToken, verifyToken } from './jwt.js';
 import { config } from '../config.js';
+import { eventLogger } from '../admin/logger.js';
 
 export const authRouter = Router();
 
@@ -33,6 +34,7 @@ authRouter.get('/auth/login', async (_req: Request, res: Response) => {
     res.redirect(authorizeUrl);
   } catch (err) {
     console.error('Failed to get request token:', err);
+    eventLogger.log('error', { detail: 'Failed to get request token' });
     res.redirect(`${config.frontendUrl}?auth_error=usos_unavailable`);
   }
 });
@@ -65,6 +67,7 @@ authRouter.get('/auth/callback', async (req: Request, res: Response) => {
 
     if (!isFromFaculty(user, config.allowedFacultyId)) {
       console.log(`Access denied for user ${user.id}: not from allowed faculty`);
+      eventLogger.log('login_denied_faculty', { usosId: String(user.id), ip: req.ip });
       res.redirect(`${config.frontendUrl}?auth_error=wrong_faculty`);
       return;
     }
@@ -73,14 +76,17 @@ authRouter.get('/auth/callback', async (req: Request, res: Response) => {
       usosId: String(user.id),
       name: `${user.first_name} ${user.last_name}`.slice(0, 200),
       email: (user.email || '').slice(0, 320),
+      isAdmin: config.adminIds.includes(String(user.id)),
     });
 
     console.log(`User logged in: ${user.id}`);
+    eventLogger.log('login_success', { usosId: String(user.id), ip: req.ip });
 
     res.cookie(SESSION_COOKIE, token, cookieOptions);
     res.redirect(config.frontendUrl);
   } catch (err) {
     console.error('OAuth callback failed:', err);
+    eventLogger.log('error', { detail: 'OAuth callback failed', ip: req.ip });
     res.redirect(`${config.frontendUrl}?auth_error=callback_failed`);
   }
 });
@@ -99,11 +105,16 @@ authRouter.get('/api/auth/me', (req: Request, res: Response) => {
     return;
   }
 
-  res.json({ name: payload.name, email: payload.email });
+  res.json({ name: payload.name, email: payload.email, isAdmin: payload.isAdmin || false });
 });
 
 // --- 4. Wylogowanie ---
-authRouter.post('/auth/logout', (_req: Request, res: Response) => {
+authRouter.post('/auth/logout', (req: Request, res: Response) => {
+  const token = req.cookies[SESSION_COOKIE];
+  if (token) {
+    const payload = verifyToken(token);
+    if (payload) eventLogger.log('logout', { usosId: payload.usosId, ip: req.ip });
+  }
   res.clearCookie(SESSION_COOKIE, {
     path: '/',
     httpOnly: true,
@@ -118,12 +129,14 @@ authRouter.post('/auth/logout', (_req: Request, res: Response) => {
 authRouter.get('/auth/verify', (req: Request, res: Response) => {
   const token = req.cookies[SESSION_COOKIE];
   if (!token) {
+    eventLogger.log('auth_verify_fail', { detail: 'no_token', ip: req.ip });
     res.sendStatus(401);
     return;
   }
 
   const payload = verifyToken(token);
   if (!payload) {
+    eventLogger.log('auth_verify_fail', { detail: 'invalid_token', ip: req.ip });
     res.sendStatus(401);
     return;
   }

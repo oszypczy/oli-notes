@@ -22,4 +22,5 @@ export const config = {
   cookieDomain: process.env.COOKIE_DOMAIN || undefined,
   isProduction: process.env.NODE_ENV === 'production',
   allowedFacultyId: process.env.ALLOWED_FACULTY_ID || '103000',
+  adminIds: (process.env.ADMIN_IDS || '').split(',').map(id => id.trim()).filter(Boolean),
 };
