@@ -16,6 +16,12 @@ export function useAuth(): UseAuthResult {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (import.meta.env.DEV) {
+      setUser({ name: 'Dev', email: '' });
+      setLoading(false);
+      return;
+    }
+
     fetch('/api/auth/me', { credentials: 'same-origin' })
       .then((res) => {
         if (!res.ok) throw new Error('Not authenticated');
