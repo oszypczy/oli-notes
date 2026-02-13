@@ -138,11 +138,10 @@ function card(l,v,c){return'<div class="stat-card '+(c||'')+'"><div class="label
 function stats(){
   api('/api/admin/stats').then(function(s){
     sg.innerHTML=
-      card('Logins today',s.loginsToday,'success')+
-      card('Total logins',s.loginsTotal,'accent')+
-      card('Resources today',s.resourceAccessToday,'accent')+
-      card('Denied today',s.deniedToday,s.deniedToday>0?'danger':'')+
-      card('Errors today',s.errorsToday,s.errorsToday>0?'danger':'')+
+      card('Total logins',s.loginsTotal,'success')+
+      card('Total resources',s.resourcesTotal,'accent')+
+      card('Total denied',s.deniedTotal,s.deniedTotal>0?'danger':'')+
+      card('Total errors',s.errorsTotal,s.errorsTotal>0?'danger':'')+
       card('Buffer',s.bufferUsed+'/'+s.bufferMax,'')+
       card('Uptime',up(s.uptimeSeconds),'accent');
     statusEl.textContent='Updated: '+new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});

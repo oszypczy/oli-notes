@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 export type EventType =
   | 'login_success'
   | 'login_denied_faculty'
@@ -14,12 +17,10 @@ export interface LogEvent {
 }
 
 export interface EventStats {
-  loginsToday: number;
   loginsTotal: number;
-  deniedToday: number;
-  errorsToday: number;
-  logoutsToday: number;
-  resourceAccessToday: number;
+  resourcesTotal: number;
+  deniedTotal: number;
+  errorsTotal: number;
   bufferUsed: number;
   bufferMax: number;
   uptimeSeconds: number;
@@ -37,20 +38,72 @@ export interface ActivityBucket {
 }
 
 const DEFAULT_MAX_SIZE = 500;
-const BUCKET_MS = 5 * 60 * 1000; // 5 minutes
+const BUCKET_MS = 5 * 60 * 1000;
+const PERSIST_INTERVAL = 60 * 1000;
+const DATA_DIR = process.env.DATA_DIR || '/app/data';
+const PERSIST_PATH = path.join(DATA_DIR, 'events.json');
+
+interface PersistedState {
+  buffer: (LogEvent | null)[];
+  head: number;
+  count: number;
+  sequence: number;
+}
 
 class EventLogger {
-  private buffer: LogEvent[];
+  private buffer: (LogEvent | null)[];
   private head = 0;
   private count = 0;
   private sequence = 0;
   private readonly maxSize: number;
   private readonly startTime: number;
+  private persistTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(maxSize = DEFAULT_MAX_SIZE) {
     this.maxSize = maxSize;
-    this.buffer = new Array(maxSize);
+    this.buffer = new Array(maxSize).fill(null);
     this.startTime = Date.now();
+    this.load();
+    this.persistTimer = setInterval(() => this.save(), PERSIST_INTERVAL);
+    process.on('SIGTERM', () => this.shutdown());
+    process.on('SIGINT', () => this.shutdown());
+  }
+
+  private load(): void {
+    try {
+      if (!fs.existsSync(PERSIST_PATH)) return;
+      const raw = fs.readFileSync(PERSIST_PATH, 'utf-8');
+      const state: PersistedState = JSON.parse(raw);
+      if (!Array.isArray(state.buffer) || state.buffer.length !== this.maxSize) return;
+      this.buffer = state.buffer;
+      this.head = state.head;
+      this.count = state.count;
+      this.sequence = state.sequence;
+      console.log(`Loaded ${this.count} events from disk`);
+    } catch {
+      console.error('Failed to load persisted events, starting fresh');
+    }
+  }
+
+  save(): void {
+    try {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+      const state: PersistedState = {
+        buffer: this.buffer,
+        head: this.head,
+        count: this.count,
+        sequence: this.sequence,
+      };
+      fs.writeFileSync(PERSIST_PATH, JSON.stringify(state));
+    } catch (err) {
+      console.error('Failed to persist events:', err);
+    }
+  }
+
+  private shutdown(): void {
+    this.save();
+    if (this.persistTimer) clearInterval(this.persistTimer);
+    process.exit(0);
   }
 
   log(type: EventType, opts?: { usosId?: string; detail?: string }): void {
@@ -82,35 +135,21 @@ class EventLogger {
   }
 
   getStats(): EventStats {
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayIso = todayStart.toISOString();
-
-    let loginsToday = 0, loginsTotal = 0, deniedToday = 0;
-    let errorsToday = 0, logoutsToday = 0, resourceAccessToday = 0;
+    let loginsTotal = 0, resourcesTotal = 0, deniedTotal = 0, errorsTotal = 0;
 
     for (let i = 0; i < this.count; i++) {
       const idx = (this.head - 1 - i + this.maxSize) % this.maxSize;
       const event = this.buffer[idx];
       if (!event) continue;
 
-      const isToday = event.timestamp >= todayIso;
-
-      if (event.type === 'login_success') {
-        loginsTotal++;
-        if (isToday) loginsToday++;
-      }
-      if (isToday) {
-        if (event.type === 'login_denied_faculty') deniedToday++;
-        if (event.type === 'error') errorsToday++;
-        if (event.type === 'logout') logoutsToday++;
-        if (event.type === 'resource_access') resourceAccessToday++;
-      }
+      if (event.type === 'login_success') loginsTotal++;
+      if (event.type === 'resource_access') resourcesTotal++;
+      if (event.type === 'login_denied_faculty') deniedTotal++;
+      if (event.type === 'error') errorsTotal++;
     }
 
     return {
-      loginsToday, loginsTotal, deniedToday, errorsToday,
-      logoutsToday, resourceAccessToday,
+      loginsTotal, resourcesTotal, deniedTotal, errorsTotal,
       bufferUsed: this.count,
       bufferMax: this.maxSize,
       uptimeSeconds: Math.floor((Date.now() - this.startTime) / 1000),
