@@ -22,6 +22,7 @@ app.use(rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/admin') || req.path.startsWith('/api/admin'),
 }));
 
 app.use(authRouter);
