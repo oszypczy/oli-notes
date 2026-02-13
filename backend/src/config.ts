@@ -21,4 +21,5 @@ export const config = {
   port: parseInt(process.env.PORT || '3000'),
   cookieDomain: process.env.COOKIE_DOMAIN || undefined,
   isProduction: process.env.NODE_ENV === 'production',
+  allowedFacultyId: process.env.ALLOWED_FACULTY_ID || '103000',
 };

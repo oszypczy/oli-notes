@@ -13,7 +13,12 @@ export function LoginScreen() {
           Notatki studenckie
         </p>
 
-        {authError && (
+        {authError === 'wrong_faculty' && (
+          <p className={styles.error}>
+            Dostęp tylko dla studentów Wydziału Elektroniki i Technik Informacyjnych.
+          </p>
+        )}
+        {authError && authError !== 'wrong_faculty' && (
           <p className={styles.error}>
             Logowanie nie powiodło się. Spróbuj ponownie.
           </p>

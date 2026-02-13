@@ -116,11 +116,24 @@ export async function getAccessToken(
 }
 
 // --- User info ---
+export interface UsosUser {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  student_programmes: Array<{
+    programme: {
+      faculty: { id: string };
+    };
+  }> | null;
+}
+
 export async function getUser(
   accessToken: string,
   accessSecret: string
-): Promise<{ id: string; first_name: string; last_name: string; email: string }> {
-  const userUrl = `${config.usosBaseUrl}/services/users/user?fields=id|first_name|last_name|email`;
+): Promise<UsosUser> {
+  const fields = 'id|first_name|last_name|email|student_programmes[programme[faculty[id]]]';
+  const userUrl = `${config.usosBaseUrl}/services/users/user?fields=${fields}`;
   const tokenData = { key: accessToken, secret: accessSecret };
 
   const requestData = { url: userUrl, method: 'GET' };
@@ -132,4 +145,11 @@ export async function getUser(
 
   if (!response.ok) throw new Error(`USOS user fetch failed: ${response.status}`);
   return response.json();
+}
+
+export function isFromFaculty(user: UsosUser, facultyId: string): boolean {
+  if (!user.student_programmes) return false;
+  return user.student_programmes.some(
+    (sp) => sp.programme?.faculty?.id === facultyId
+  );
 }

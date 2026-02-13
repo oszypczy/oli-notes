@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Router, Request, Response } from 'express';
-import { getRequestToken, getAccessToken, getUser } from './usos.js';
+import { getRequestToken, getAccessToken, getUser, isFromFaculty } from './usos.js';
 import { signToken, verifyToken } from './jwt.js';
 import { config } from '../config.js';
 
@@ -61,6 +61,12 @@ authRouter.get('/auth/callback', async (req: Request, res: Response) => {
 
     if (!user.id || !user.first_name || !user.last_name) {
       throw new Error('Incomplete user data from USOS');
+    }
+
+    if (!isFromFaculty(user, config.allowedFacultyId)) {
+      console.log(`Access denied for user ${user.id}: not from allowed faculty`);
+      res.redirect(`${config.frontendUrl}?auth_error=wrong_faculty`);
+      return;
     }
 
     const token = signToken({
