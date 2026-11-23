@@ -2,11 +2,19 @@ services:
   notes:
     image: ghcr.io/oszypczy/notes:latest
     volumes:
-      - ~/data/notes/pdfs:/usr/share/nginx/html/pdfs:ro
+      - /home/opc/data/notes/pdfs:/usr/share/nginx/html/pdfs:ro
     depends_on:
       auth:
         condition: service_started
     restart: unless-stopped
+    mem_limit: 48m
+    cpus: 0.5
+    pids_limit: 100
+    read_only: true
+    tmpfs: [/var/cache/nginx, /run, /tmp]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, NET_BIND_SERVICE]
+    security_opt: [no-new-privileges:true]
     networks:
       - internal
       - proxy
@@ -15,8 +23,15 @@ services:
     image: ghcr.io/oszypczy/notes-auth:latest
     env_file: .env
     volumes:
-      - ~/data/notes/logs:/app/data
+      - /home/opc/data/notes/logs:/app/data
     restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 100
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
     networks:
       - internal
 

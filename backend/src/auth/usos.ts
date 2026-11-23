@@ -65,7 +65,7 @@ export async function getRequestToken(state: string): Promise<{ token: string; a
 
   return {
     token,
-    authorizeUrl: `${config.usosBaseUrl}/services/oauth/authorize?oauth_token=${token}`,
+    authorizeUrl: `${config.usosBaseUrl}/services/oauth/authorize?oauth_token=${encodeURIComponent(token)}`,
   };
 }
 

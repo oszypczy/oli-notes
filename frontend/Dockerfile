@@ -1,11 +1,12 @@
-FROM node:20.20.0-alpine AS build
+FROM node:24.22.3-alpine AS build
 WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ .
 RUN npm run build
 
-FROM nginx:1.29.5-alpine
+FROM nginx:1.30.7-alpine
+RUN apk upgrade --no-cache
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80

@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import { verifyToken } from '../auth/jwt.js';
+import { config } from '../config.js';
 import { eventLogger, EventType } from './logger.js';
 import { serveAdminPanel, serveAdminScript } from './panel.js';
 
@@ -23,7 +24,8 @@ function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   if (!token) { res.status(401).json({ error: 'Not authenticated' }); return; }
 
   const payload = verifyToken(token);
-  if (!payload || !payload.isAdmin) { res.status(403).json({ error: 'Forbidden' }); return; }
+  // Check the live allowlist, not the JWT claim, so removing an admin takes effect immediately.
+  if (!payload || !config.adminIds.includes(payload.usosId)) { res.status(403).json({ error: 'Forbidden' }); return; }
 
   next();
 }

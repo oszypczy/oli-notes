@@ -105,7 +105,7 @@ authRouter.get('/api/auth/me', (req: Request, res: Response) => {
     return;
   }
 
-  res.json({ name: payload.name, email: payload.email, isAdmin: payload.isAdmin || false });
+  res.json({ name: payload.name, email: payload.email, isAdmin: config.adminIds.includes(payload.usosId) });
 });
 
 // --- 4. Wylogowanie ---
